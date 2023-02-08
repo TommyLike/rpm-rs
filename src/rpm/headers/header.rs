@@ -43,7 +43,7 @@ where
     T: Tag,
 {
     #[cfg(feature = "async-futures")]
-    pub(crate) async fn parse_async<I: AsyncRead + Unpin>(
+    pub async fn parse_async<I: AsyncRead + Unpin>(
         input: &mut I,
     ) -> Result<Header<T>, RPMError> {
         let mut buf: [u8; 16] = [0; 16];
@@ -124,7 +124,7 @@ where
         })
     }
 
-    pub(crate) fn parse<I: std::io::BufRead>(input: &mut I) -> Result<Header<T>, RPMError> {
+    pub fn parse<I: std::io::BufRead>(input: &mut I) -> Result<Header<T>, RPMError> {
         let mut buf: [u8; 16] = [0; 16];
         input.read_exact(&mut buf)?;
         let index_header = IndexHeader::parse(&buf)?;
@@ -135,7 +135,7 @@ where
     }
 
     #[cfg(feature = "async-futures")]
-    pub(crate) async fn write_async<W: AsyncWrite + Unpin>(
+    pub async fn write_async<W: AsyncWrite + Unpin>(
         &self,
         out: &mut W,
     ) -> Result<(), RPMError> {
@@ -147,7 +147,7 @@ where
         Ok(())
     }
 
-    pub(crate) fn write<W: std::io::Write>(&self, out: &mut W) -> Result<(), RPMError> {
+    pub fn write<W: std::io::Write>(&self, out: &mut W) -> Result<(), RPMError> {
         self.index_header.write(out)?;
         for entry in &self.index_entries {
             entry.write_index(out)?;
@@ -309,7 +309,7 @@ impl Header<IndexSignatureTag> {
     ///
     /// Please use the [`builder`](Self::builder()) which has modular and safe API.
     #[cfg(feature = "signature-meta")]
-    pub(crate) fn new_signature_header(
+    pub fn new_signature_header(
         headers_plus_payload_size: u32,
         md5sum: &[u8],
         sha1: String,
@@ -328,7 +328,7 @@ impl Header<IndexSignatureTag> {
     }
 
     #[cfg(feature = "async-futures")]
-    pub(crate) async fn parse_signature_async<I: AsyncRead + Unpin>(
+    pub async fn parse_signature_async<I: AsyncRead + Unpin>(
         input: &mut I,
     ) -> Result<Header<IndexSignatureTag>, RPMError> {
         let result = Self::parse_async(input).await?;
@@ -342,7 +342,7 @@ impl Header<IndexSignatureTag> {
         Ok(result)
     }
 
-    pub(crate) fn parse_signature<I: std::io::BufRead>(
+    pub fn parse_signature<I: std::io::BufRead>(
         input: &mut I,
     ) -> Result<Header<IndexSignatureTag>, RPMError> {
         let result = Self::parse(input)?;
@@ -358,7 +358,7 @@ impl Header<IndexSignatureTag> {
     }
 
     #[cfg(feature = "async-futures")]
-    pub(crate) async fn write_signature_async<W: AsyncWrite + Unpin>(
+    pub async fn write_signature_async<W: AsyncWrite + Unpin>(
         &self,
         out: &mut W,
     ) -> Result<(), RPMError> {
@@ -371,7 +371,7 @@ impl Header<IndexSignatureTag> {
         Ok(())
     }
 
-    pub(crate) fn write_signature<W: std::io::Write>(&self, out: &mut W) -> Result<(), RPMError> {
+    pub fn write_signature<W: std::io::Write>(&self, out: &mut W) -> Result<(), RPMError> {
         self.write(out)?;
         let modulo = self.index_header.header_size % 8;
         if modulo > 0 {

@@ -194,7 +194,7 @@ impl RPMPackageMetadata {
         })
     }
 
-    pub(crate) fn parse<T: std::io::BufRead>(input: &mut T) -> Result<Self, RPMError> {
+    pub fn parse<T: std::io::BufRead>(input: &mut T) -> Result<Self, RPMError> {
         let mut lead_buffer = [0; LEAD_SIZE];
         input.read_exact(&mut lead_buffer)?;
         let lead = Lead::parse(&lead_buffer)?;
@@ -207,7 +207,7 @@ impl RPMPackageMetadata {
         })
     }
 
-    pub(crate) fn write<W: std::io::Write>(&self, out: &mut W) -> Result<(), RPMError> {
+    pub fn write<W: std::io::Write>(&self, out: &mut W) -> Result<(), RPMError> {
         self.lead.write(out)?;
         self.signature.write_signature(out)?;
         self.header.write(out)?;
